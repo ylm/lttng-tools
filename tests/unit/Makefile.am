@@ -88,7 +88,7 @@ SESSIOND_OBJS += $(top_builddir)/src/bin/lttng-sessiond/trace-ust.$(OBJEXT) \
 endif
 
 test_session_SOURCES = test_session.c
-test_session_LDADD = $(LIBTAP) $(LIBCOMMON) $(LIBRELAYD) $(LIBSESSIOND_COMM) \
+test_session_LDADD = $(LIBTAP) $(LIBSESSIOND_COMM) $(LIBCOMMON) $(LIBRELAYD) \
 		     $(LIBHASHTABLE) $(DL_LIBS) -lrt -lurcu-common -lurcu \
 		     $(KMOD_LIBS) \
 		     $(top_builddir)/src/lib/lttng-ctl/liblttng-ctl.la \
@@ -108,7 +108,7 @@ endif
 # UST data structures unit test
 if HAVE_LIBLTTNG_UST_CTL
 test_ust_data_SOURCES = test_ust_data.c
-test_ust_data_LDADD = $(LIBTAP) $(LIBCOMMON) $(LIBRELAYD) $(LIBSESSIOND_COMM) \
+test_ust_data_LDADD = $(LIBTAP) $(LIBSESSIOND_COMM) $(LIBCOMMON) $(LIBRELAYD) \
 		      $(LIBHASHTABLE) $(DL_LIBS) -lrt -lurcu-common -lurcu \
 		      -llttng-ust-ctl \
 		      $(KMOD_LIBS) \
@@ -131,7 +131,7 @@ KERN_DATA_TRACE=$(top_builddir)/src/bin/lttng-sessiond/trace-kernel.$(OBJEXT) \
 		$(LIBLTTNG_CTL)
 
 test_kernel_data_SOURCES = test_kernel_data.c
-test_kernel_data_LDADD = $(LIBTAP) $(LIBCOMMON) $(LIBRELAYD) $(LIBSESSIOND_COMM) \
+test_kernel_data_LDADD = $(LIBTAP) $(LIBSESSIOND_COMM) $(LIBCOMMON) $(LIBRELAYD) \
 			 $(LIBHASHTABLE) $(DL_LIBS) -lrt
 test_kernel_data_LDADD += $(KERN_DATA_TRACE)
 
