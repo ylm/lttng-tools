@@ -228,6 +228,7 @@ AC_CHECK_LIB([dl], [dlopen], [
 		AC_MSG_ERROR([Cannot find dlopen in libdl nor libc. Use [LDFLAGS]=-Ldir to specify their location.])
 	])
 ])
+AC_SUBST(DL_CFLAGS)
 AC_SUBST(DL_LIBS)
 
 # Check if libdl has dlmopen support.
@@ -441,6 +442,7 @@ PKG_CHECK_MODULES([POPT], [popt],
     )
   ]
 )
+AC_SUBST(POPT_CFLAGS)
 AC_SUBST(POPT_LIBS)
 
 PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.7.6])
@@ -485,6 +487,7 @@ AC_CHECK_FUNCS([uuid_generate],
     )
   ]
 )
+AC_SUBST(UUID_CFLAGS)
 AC_SUBST(UUID_LIBS)
 
 AC_CHECK_FUNC([clock_gettime], [AC_DEFINE_UNQUOTED([LTTNG_HAVE_CLOCK_GETTIME], 1, [Has clock_gettime() support.])])
@@ -546,6 +549,7 @@ AS_IF([test "x$with_kmod" != "xno"],
     )
   ]
 )
+AC_SUBST(KMOD_CFLAGS)
 AC_SUBST(KMOD_LIBS)
 
 # Check for liblttng-ust-ctl, fail if it's not found,
