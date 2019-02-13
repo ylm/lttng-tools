@@ -258,7 +258,7 @@ char **strutils_split(const char *input, char delim, bool escape_delim)
 {
 	size_t at;
 	size_t number_of_substrings = 1;
-	size_t longest_substring_len = 0;
+	size_t longest_substring_len = 0U;
 	const char *s;
 	const char *last;
 	char **substrings = NULL;
@@ -291,7 +291,7 @@ char **strutils_split(const char *input, char delim, bool escape_delim)
 		}
 	}
 
-	if ((s - last - 1) > longest_substring_len) {
+	if ((s - last - 1U) > longest_substring_len) {
 		longest_substring_len = s - last - 1;
 	}
 
