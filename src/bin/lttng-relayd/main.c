@@ -321,7 +321,8 @@ end:
  */
 static int config_entry_handler(const struct config_entry *entry, void *unused)
 {
-	int ret = 0, i;
+	int ret = 0;
+	unsigned int idx;
 
 	if (!entry || !entry->name || !entry->value) {
 		ret = -EINVAL;
@@ -329,15 +330,15 @@ static int config_entry_handler(const struct config_entry *entry, void *unused)
 	}
 
 	/* Check if the option is to be ignored */
-	for (i = 0; i < sizeof(config_ignore_options) / sizeof(char *); i++) {
-		if (!strcmp(entry->name, config_ignore_options[i])) {
+	for (idx = 0U; idx < sizeof(config_ignore_options) / sizeof(char *); idx++) {
+		if (!strcmp(entry->name, config_ignore_options[idx])) {
 			goto end;
 		}
 	}
 
-	for (i = 0; i < (sizeof(long_options) / sizeof(struct option)) - 1; i++) {
+	for (idx = 0; idx < (sizeof(long_options) / sizeof(struct option)) - 1; idx++) {
 		/* Ignore if entry name is not fully matched. */
-		if (strcmp(entry->name, long_options[i].name)) {
+		if (strcmp(entry->name, long_options[idx].name)) {
 			continue;
 		}
 
@@ -346,7 +347,7 @@ static int config_entry_handler(const struct config_entry *entry, void *unused)
 		 * we have to check if the value is "true". We support
 		 * non-zero numeric values, true, on and yes.
 		 */
-		if (!long_options[i].has_arg) {
+		if (!long_options[idx].has_arg) {
 			ret = config_parse_value(entry->value);
 			if (ret <= 0) {
 				if (ret) {
@@ -358,7 +359,7 @@ static int config_entry_handler(const struct config_entry *entry, void *unused)
 			}
 		}
 
-		ret = set_option(long_options[i].val, entry->value, entry->name);
+		ret = set_option(long_options[idx].val, entry->value, entry->name);
 		goto end;
 	}
 
