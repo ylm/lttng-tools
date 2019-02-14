@@ -1247,7 +1247,7 @@ PPRINT_SUBTITLE([Tests])
 
 # Print clear message that tests won't be built
 AS_IF([test "x$build_tests" = "xno"],[
-	PPRINT_WARN([Tests won't be built since some binaries were disabled])
+	PPRINT_WARN([Tests won't be built since some binaries were disabled]) #'
 ])
 
 # LTTng UST Java agent JUL tests enabled/disabled
