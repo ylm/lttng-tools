@@ -88,7 +88,7 @@ enum {
 
 struct compat_epoll_event {
 	int epfd;
-	uint32_t nb_fd;       /* Current number of fd in events */
+	int nb_fd;       /* Current number of fd in events */
 	uint32_t alloc_size; /* Size of events array */
 	uint32_t init_size;	/* Initial size of events array */
 	struct epoll_event *events;
@@ -96,7 +96,7 @@ struct compat_epoll_event {
 #define lttng_poll_event compat_epoll_event
 
 static inline int __lttng_epoll_get_prev_fd(struct lttng_poll_event *events,
-		int index, uint32_t nb_fd)
+		int index, int nb_fd)
 {
 	assert(events);
 	assert(index != nb_fd);
@@ -249,7 +249,7 @@ static inline void lttng_poll_clean(struct lttng_poll_event *events)
 
 #include <poll.h>
 #include <stdint.h>
-
+#define NFDS_T_MAX ((sizeof(nfds_t) == sizeof(uint64_t)) ? UINT64_MAX : ((uint64_t) 1 << (sizeof(nfds_t) * 8)) - 1)
 enum {
 	/* Polling variables compatibility for poll */
 	LPOLLIN = POLLIN,
@@ -275,7 +275,7 @@ enum {
 };
 
 struct compat_poll_event_array {
-	uint32_t nb_fd;       /* Current number of fd in events */
+	int nb_fd;       /* Current number of fd in events */
 	uint32_t alloc_size; /* Size of events array */
 	/* Initial size of the pollset. We never shrink below that. */
 	uint32_t init_size;
@@ -300,7 +300,7 @@ struct compat_poll_event {
 #define lttng_poll_event compat_poll_event
 
 static inline int __lttng_poll_get_prev_fd(struct lttng_poll_event *events,
-		int index, uint32_t nb_fd)
+		int index, int nb_fd)
 {
 	assert(events);
 	assert(index != nb_fd);
