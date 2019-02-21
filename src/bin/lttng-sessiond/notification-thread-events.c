@@ -2460,6 +2460,22 @@ int handle_notification_thread_client_connect(
 		goto error;
 	}
 
+	ret = lttcomm_setsockopt_sndbuf_len(client->socket);
+	if (ret < 0) {
+		ERR("[notification-thread] Failed to set socket options on new notification channel client socket");
+		printf("ALLO!!!!\r\n");
+		ret = 0;
+		goto error;
+	}
+
+	ret = lttcomm_setsockopt_rcvbuf_len(client->socket);
+	if (ret < 0) {
+		ERR("[notification-thread] Failed to set socket options on new notification channel client socket");
+		printf("ALLO!!!!\r\n");
+		ret = 0;
+		goto error;
+	}
+
 	ret = lttng_poll_add(&state->events, client->socket,
 			LPOLLIN | LPOLLERR |
 			LPOLLHUP | LPOLLRDHUP);
@@ -2566,14 +2582,18 @@ int client_flush_outgoing_queue(struct notification_client *client,
 
 	assert(client->communication.outbound.buffer.size != 0);
 	to_send_count = client->communication.outbound.buffer.size;
+	printf("Sending %i bytes...\n",to_send_count);
 	DBG("[notification-thread] Flushing client (socket fd = %i) outgoing queue",
 			client->socket);
 
+	//May not be a socket...
+	//lttcomm_setsockopt_sndbuf_len(client->socket);
 	ret = lttcomm_send_unix_sock_non_block(client->socket,
 			client->communication.outbound.buffer.data,
 			to_send_count);
 	if ((ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) ||
 			(ret > 0 && ret < to_send_count)) {
+		printf("Seems like the pipe is clogged!\n");
 		DBG("[notification-thread] Client (socket fd = %i) outgoing queue could not be completely flushed",
 				client->socket);
 		to_send_count -= max(ret, 0);
@@ -2614,9 +2634,11 @@ int client_flush_outgoing_queue(struct notification_client *client,
 		if (ret) {
 			goto error;
 		}
+		printf("This should still return an error...\r\n");
 		ret = lttng_poll_mod(&state->events, client->socket,
 				CLIENT_POLL_MASK_IN);
 		if (ret) {
+			printf("... now it does?\r\n");
 			goto error;
 		}
 

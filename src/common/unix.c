@@ -700,6 +700,32 @@ end:
  */
 #ifdef __linux__
 LTTNG_HIDDEN
+int lttcomm_setsockopt_rcvbuf_len(int sock)
+{
+	int ret, on = 128;
+
+	/* Set socket for credentials retrieval */
+	ret = setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &on, sizeof(on));
+	if (ret < 0) {
+		PERROR("Couldn't lower receive buffer's length.");
+	}
+	return ret;
+}
+
+LTTNG_HIDDEN
+int lttcomm_setsockopt_sndbuf_len(int sock)
+{
+	int ret, on = 1024;
+
+	/* Set socket for credentials retrieval */
+	ret = setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &on, sizeof(on));
+	if (ret < 0) {
+		PERROR("Couldn't lower send buffer's length.");
+	}
+	return ret;
+}
+
+LTTNG_HIDDEN
 int lttcomm_setsockopt_creds_unix_sock(int sock)
 {
 	int ret, on = 1;

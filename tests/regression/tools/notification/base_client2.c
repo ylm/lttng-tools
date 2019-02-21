@@ -43,6 +43,8 @@
 #include <lttng/trigger/trigger.h>
 #include <lttng/lttng-error.h>
 
+static unsigned int nr_notifications = 0;
+static unsigned int nr_expected_notifications = 0;
 static const char *session_name = NULL;
 static const char *channel_name = NULL;
 static double threshold_ratio = 0.0;
@@ -60,6 +62,7 @@ int parse_arguments(char **argv) {
 	const char *buffer_usage_type_string = NULL;
 	const char *buffer_usage_threshold_type = NULL;
 	const char *buffer_usage_threshold_value = NULL;
+	const char *nr_expected_notifications_string = NULL;
 
 	session_name = argv[1];
 	channel_name = argv[2];
@@ -67,6 +70,7 @@ int parse_arguments(char **argv) {
 	buffer_usage_type_string = argv[4];
 	buffer_usage_threshold_type = argv[5];
 	buffer_usage_threshold_value = argv[6];
+	nr_expected_notifications_string = argv[7];
 
 	/* Parse arguments */
 	/* Domain type */
@@ -104,6 +108,8 @@ int parse_arguments(char **argv) {
 		sscanf(buffer_usage_threshold_value, "%lf", &threshold_ratio);
 	}
 
+	/* Number of notification to expect */
+	sscanf(nr_expected_notifications_string, "%d", &nr_expected_notifications);
 
 	return 0;
 error:
@@ -119,7 +125,6 @@ int main(int argc, char **argv)
 	struct lttng_condition *condition = NULL;
 	struct lttng_action *action = NULL;
 	struct lttng_trigger *trigger = NULL;
-	char bobby[2048];
 
 	/*
 	 * Disable buffering on stdout.
@@ -246,13 +251,15 @@ int main(int argc, char **argv)
 		const struct lttng_evaluation *notification_evaluation;
 		const struct lttng_condition *notification_condition;
 
+		if (nr_notifications == nr_expected_notifications) {
+			ret = 0;
+			goto end;
+		}
 		/* Receive the next notification. */
 		status = lttng_notification_channel_get_next_notification(
 				notification_channel,
 				&notification);
 
-		gets(bobby);
-		printf("Got mail!\n");
 		switch (status) {
 		case LTTNG_NOTIFICATION_CHANNEL_STATUS_OK:
 			break;
@@ -280,6 +287,7 @@ int main(int argc, char **argv)
 		notification_evaluation = lttng_notification_get_evaluation(notification);
 
 		ret = handle_condition(notification_condition, notification_evaluation);
+		nr_notifications++;
 
 		lttng_notification_destroy(notification);
 		if (ret != 0) {
@@ -426,6 +434,7 @@ int handle_condition(
 		goto end;
 	}
 
+	printf("notification: %s %d\n", string_condition_type, nr_notifications);
 end:
 	return ret;
 }

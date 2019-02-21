@@ -28,6 +28,7 @@
 #include "lttng-ctl-helper.h"
 #include <sys/select.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 static
 int handshake(struct lttng_notification_channel *channel);
@@ -186,6 +187,23 @@ struct lttng_notification_channel *lttng_notification_channel_create(
 	}
 	fd = ret;
 
+	ret = lttcomm_setsockopt_sndbuf_len(fd);
+	if (ret < 0) {
+		ERR("[notification-thread] Failed to set socket options on new notification channel client socket");
+		printf("ALLO!!!!\r\n");
+		ret = 0;
+		goto error;
+	}
+
+	ret = lttcomm_setsockopt_rcvbuf_len(fd);
+	if (ret < 0) {
+		ERR("[notification-thread] Failed to set socket options on new notification channel client socket");
+		printf("ALLO!!!!\r\n");
+		ret = 0;
+		goto error;
+	}
+
+
 set_fd:
 	channel->socket = fd;
 
@@ -242,7 +260,7 @@ lttng_notification_channel_get_next_notification(
 
 	/*
 	 * Block on select() instead of the message reception itself as the
-	 * recvmsg() wrappers always restard on EINTR. We choose to wait
+	 * recvmsg() wrappers always restart on EINTR. We choose to wait
 	 * using select() in order to:
 	 *   1) Return if a signal occurs,
 	 *   2) Not deal with partially received messages.

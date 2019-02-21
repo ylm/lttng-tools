@@ -624,6 +624,7 @@ void *thread_notification(void *data)
 					}
 
 					if (revents & LPOLLOUT) {
+						printf("Since epoll mod should'nt be working, what are you doing here?\r\n");
 						ret = handle_notification_thread_client_out(
 							&state, fd);
 						if (ret) {

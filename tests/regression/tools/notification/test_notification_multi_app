@@ -113,6 +113,7 @@ function start_client {
 	local buffer_usage_threshold_value=$7
 	local nr_expected_notification=$8
 
+	echo "Started base client :)"
 	${CURDIR}/base_client ${session_name} ${channel_name} ${domain_type} ${buffer_usage_type} ${buffer_usage_threshold_type} ${buffer_usage_threshold_value} ${nr_expected_notification} > ${output_file} &
 	pid=$!
 
@@ -222,7 +223,8 @@ function test_multi_app ()
 	start_lttng_sessiond
 
 	create_lttng_session_ok $SESSION_NAME $TRACE_PATH
-	enable_${domain_type}_lttng_channel_ok $SESSION_NAME $CHANNEL_NAME --subbuf-size=$PAGE_SIZE
+	enable_${domain_type}_lttng_channel_ok $SESSION_NAME $CHANNEL_NAME "--subbuf-size=$PAGE_SIZE --monitor-timer=10000"
+	read
 	enable_${domain_type}_lttng_event_ok $SESSION_NAME $event_name $CHANNEL_NAME
 
 	# Fetch consumerd testpoint pipe information
