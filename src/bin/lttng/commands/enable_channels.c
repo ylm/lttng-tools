@@ -210,9 +210,9 @@ static int enable_channel(char *session_name)
 
 	/* Setting channel output */
 	if (opt_output) {
-		if (!strncmp(output_mmap, opt_output, strlen(output_mmap))) {
+		if (!strcmp(output_mmap, opt_output)) {
 			chan_opts.attr.output = LTTNG_EVENT_MMAP;
-		} else if (!strncmp(output_splice, opt_output, strlen(output_splice))) {
+		} else if (!strcmp(output_splice, opt_output)) {
 			chan_opts.attr.output = LTTNG_EVENT_SPLICE;
 		} else {
 			ERR("Unknown output type %s. Possible values are: %s, %s\n",

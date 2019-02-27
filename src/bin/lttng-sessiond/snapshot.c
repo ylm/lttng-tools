@@ -251,7 +251,7 @@ struct snapshot_output *snapshot_find_output_by_name(const char *name,
 
 	cds_lfht_for_each_entry(snapshot->output_ht->ht, &iter.iter, output,
 		node.node) {
-		if (!strncmp(output->name, name, strlen(name))) {
+		if (!strcmp(output->name, name)) {
 			return output;
 		}
 	}

@@ -2310,7 +2310,7 @@ static int _cmd_enable_event(struct ltt_session *session,
 		}
 
 		/* The wild card * means that everything should be enabled. */
-		if (strncmp(event->name, "*", 1) == 0 && strlen(event->name) == 1) {
+		if (!strcmp(event->name, "*")) {
 			ret = event_agent_enable_all(usess, agt, event, filter,
 					filter_expression);
 		} else {
