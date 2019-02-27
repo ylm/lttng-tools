@@ -39,7 +39,7 @@ static void __attribute__((constructor)) lttng_testpoint_check(void)
 
 	testpoint_env_val = getenv(lttng_testpoint_env_var);
 	if (testpoint_env_val != NULL
-			&& (strncmp(testpoint_env_val, "1", 1) == 0)) {
+			&& strcmp(testpoint_env_val, "1") == 0) {
 		lttng_testpoint_activated = 1;
 	}
 }

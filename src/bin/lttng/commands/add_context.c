@@ -885,15 +885,15 @@ int find_ctx_type_perf_raw(const char *ctx, struct ctx_type *type)
 		cur_list = NULL;
 		switch (field_pos) {
 		case 0:
-			if (strncmp(next, "perf", 4) != 0) {
+			if (strcmp(next, "perf") != 0) {
 				ret = -1;
 				goto end;
 			}
 			break;
 		case 1:
-			if (strncmp(next, "cpu", 3) == 0) {
+			if (strcmp(next, "cpu") == 0) {
 				type->opt->ctx_type = CONTEXT_PERF_CPU_COUNTER;
-			} else if (strncmp(next, "thread", 4) == 0) {
+			} else if (strcmp(next, "thread") == 0) {
 				type->opt->ctx_type = CONTEXT_PERF_THREAD_COUNTER;
 			} else {
 				ret = -1;
@@ -901,7 +901,7 @@ int find_ctx_type_perf_raw(const char *ctx, struct ctx_type *type)
 			}
 			break;
 		case 2:
-			if (strncmp(next, "raw", 3) != 0) {
+			if (strcmp(next, "raw") != 0) {
 				ret = -1;
 				goto end;
 			}

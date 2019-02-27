@@ -22,7 +22,7 @@ CURDIR=$(dirname $0)/
 TESTDIR=$CURDIR/../..
 SESSION_NAME="perf_counters"
 EVENT_NAME="tp:tptest"
-NUM_TESTS=24
+NUM_TESTS=28
 NR_ITER=1
 NR_USEC_WAIT=1
 TESTAPP_PATH="$TESTDIR/utils/testapp"
@@ -55,6 +55,10 @@ function test_parsing_raw()
 	enable_ust_lttng_event_per_chan $SESSION_NAME $EVENT_NAME $CHAN_NAME
 
 	add_context_ust_ok $SESSION_NAME $CHAN_NAME "perf:thread:raw:r0110:test"
+	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perform:thread:raw:r0110:test"
+	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perf:threadish:raw:r0110:test"
+	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perf:cpush:raw:r0110:test"
+	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perf:thread:rawesome:r0110:test"
 	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perf:thread:raw:rZZZ:test"
 	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perf:thread:raw:b0110:test"
 	add_context_ust_fail $SESSION_NAME $CHAN_NAME "perf:thread:raw:r0110:"
