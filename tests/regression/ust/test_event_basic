@@ -24,7 +24,7 @@ SESSION_NAME="valid_filter"
 EVENT_NAME="tp:tptest"
 
 
-NUM_TESTS=25
+NUM_TESTS=28
 
 source $TESTDIR/utils/utils.sh
 
@@ -43,7 +43,13 @@ function test_event_basic()
 	create_lttng_session_ok $SESSION_NAME2 $TRACE_PATH
 
 	enable_ust_lttng_channel_ok $SESSION_NAME $CHAN_NAME
+
+	enable_ust_lttng_channel_fail $SESSION_NAME2 $CHAN_NAME2 "--output=splice"
+	enable_ust_lttng_channel_fail $SESSION_NAME2 $CHAN_NAME2 "--output=mmap-o-spread"
+
 	enable_ust_lttng_channel_ok $SESSION_NAME2 $CHAN_NAME2
+
+	enable_ust_lttng_channel_fail $SESSION_NAME2 $CHAN_NAME2
 
 	enable_ust_lttng_event_ok $SESSION_NAME $EVENT_NAME $CHAN_NAME
 	enable_ust_lttng_event_ok $SESSION_NAME $EVENT_NAME2 $CHAN_NAME

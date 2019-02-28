@@ -19,9 +19,30 @@ TEST_DESC="Kernel tracer - Channel configuration"
 
 CURDIR=$(dirname $0)/
 TESTDIR=$CURDIR/../..
-NUM_TESTS=8
+NUM_TESTS=14
 
 source $TESTDIR/utils/utils.sh
+
+function test_channel_output_opt()
+{
+	TRACE_PATH=$(mktemp -d)
+	SESSION_NAME="test_session_name"
+	CHANNEL_NAME="test_channel_name"
+	CHANNEL_NAME2="test_channel_name2"
+	create_lttng_session_ok "$SESSION_NAME" "$TRACE_PATH"
+
+	# Try to create channel with invalid output types
+	lttng_enable_kernel_channel_fail "$SESSION_NAME" "$CHANNEL_NAME" "--output=splicethenice"
+	lttng_enable_kernel_channel_fail "$SESSION_NAME" "$CHANNEL_NAME" "--output=mmap-o-spread"
+
+	# Try to create channel with valid output types
+	lttng_enable_kernel_channel_ok "$SESSION_NAME" "$CHANNEL_NAME" "--output=splice"
+	lttng_enable_kernel_channel_ok "$SESSION_NAME" "$CHANNEL_NAME2" "--output=mmap"
+
+	destroy_lttng_session_ok "$SESSION_NAME"
+
+	rm -rf "$TRACE_PATH"
+}
 
 function test_channel_buffer()
 {
@@ -69,6 +90,7 @@ skip $isroot "Root access is needed. Skipping all tests." $NUM_TESTS ||
 
 	test_channel_buffer
 	test_channel_buffer_too_large
+	test_channel_output_opt
 
 	stop_lttng_sessiond
 }
