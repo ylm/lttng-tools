@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include <tap/tap.h>
 
@@ -40,9 +41,9 @@ int lttng_opt_verbose;
 int lttng_opt_mi;
 
 #ifdef HAVE_EPOLL
-#define NUM_TESTS 13
+#define NUM_TESTS 16
 #else
-#define NUM_TEST 7
+#define NUM_TEST 10
 #endif
 
 #if 0
@@ -93,7 +94,7 @@ void test_alloc()
 }
 
 /* Tests stuff related to what would be handled with epoll_ctl. */
-void test_poll_ctl()
+void test_add_del()
 {
 	struct lttng_poll_event poll_events;
 	//Test add
@@ -108,13 +109,52 @@ void test_poll_ctl()
 	ok(LTTNG_POLL_GETNB(&poll_events) == 0, "Set created empty");
 
 	ok(!lttng_poll_add(&poll_events, 1, LPOLLIN), "Adding valid FD");
-	
-	ok(LTTNG_POLL_GETNB(&poll_events) == 1, "Set created empty");
+	ok(LTTNG_POLL_GETNB(&poll_events) == 1, "FD was added to the set");
+
+	ok(!lttng_poll_del(&poll_events, 2), "Removing invalid FD");
+	ok(LTTNG_POLL_GETNB(&poll_events) == 1, "FD is still in the set");
+
+	ok(!lttng_poll_del(&poll_events, 1), "Removing valid FD");
+	ok(LTTNG_POLL_GETNB(&poll_events) == 0, "FD was removed from the set");
+
 #if 0
-	ok(LTTNG_POLL_GETSZ(&poll_events) == 1, "Get proper size");
+	ok(LTTNG_POLL_GETSZ(LTTNG_POLL_GETEV(&poll_events, 0)) == 1, "Get proper size");
 #endif
 	
 	lttng_poll_clean(&poll_events);
+}
+
+void test_mod_wait()
+{
+	struct lttng_poll_event poll_events;
+	//Code unshamelly taken from pipe(2) man page
+	int pipefd[2];
+	pid_t cpid;
+	char buf;
+
+	if (pipe(pipefd) == -1) {
+		diag("We should really abort the test...");
+	}
+
+	cpid = fork();
+	if (cpid == 0) {
+		lttng_poll_create(&poll_events, 1, NULL);
+		lttng_poll_add(&poll_events, pipefd[0], LPOLLIN);
+		close(pipefd[1]);
+		ok(lttng_poll_wait(&poll_events, 3) != -1, "Wait on receive");
+		ok(lttng_poll_mod(&poll_events, pipefd[0], LPOLLHUP) == 0, "Change for pipe close");
+		ok(lttng_poll_wait(&poll_events, 5) != -1, "Wait on close");
+		close(pipefd[0]);
+		lttng_poll_clean(&poll_events);
+		_exit(EXIT_SUCCESS);
+	} else {
+		close(pipefd[0]);
+		write(pipefd[1], &buf, 1);
+		sleep(2);
+		close(pipefd[1]);
+		wait(NULL);
+	}
+
 }
 
 int main(int argc, const char *argv[])
@@ -124,6 +164,7 @@ int main(int argc, const char *argv[])
 	test_epoll_compat();
 #endif
 	test_alloc();
-	test_poll_ctl();
+	test_add_del();
+	test_mod_wait();
 	return exit_status();
 }
