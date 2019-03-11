@@ -1425,6 +1425,7 @@ int lttng_ustconsumer_recv_cmd(struct lttng_consumer_local_data *ctx,
 		struct ustctl_consumer_channel_attr attr;
 
 		/* Create a plain object and reserve a channel key. */
+		printf("");
 		channel = allocate_channel(msg.u.ask_channel.session_id,
 				msg.u.ask_channel.pathname, msg.u.ask_channel.name,
 				msg.u.ask_channel.uid, msg.u.ask_channel.gid,

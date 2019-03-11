@@ -838,6 +838,10 @@ void *consumer_timer_thread(void *data)
 			continue;
 		} else if (signr == LTTNG_CONSUMER_SIG_SWITCH) {
 			metadata_switch_timer(ctx, &info);
+			if (ctx->type == LTTNG_CONSUMER64_UST || ctx->type ==
+					LTTNG_CONSUMER32_UST) {
+				live_timer(ctx, &info);
+			}
 		} else if (signr == LTTNG_CONSUMER_SIG_TEARDOWN) {
 			cmm_smp_mb();
 			CMM_STORE_SHARED(timer_signal.qs_done, 1);

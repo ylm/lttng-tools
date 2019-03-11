@@ -716,6 +716,7 @@ static int process_client_msg(struct command_ctx *cmd_ctx, int sock,
 
 	*sock_error = 0;
 
+	//XXX: Problem likely resides here...
 	switch (cmd_ctx->lsm->cmd_type) {
 	case LTTNG_CREATE_SESSION:
 	case LTTNG_CREATE_SESSION_SNAPSHOT:
@@ -1065,6 +1066,7 @@ skip_domain:
 		}
 	}
 
+	//XXX:Session should be created around here...
 	/* Process by command type */
 	switch (cmd_ctx->lsm->cmd_type) {
 	case LTTNG_ADD_CONTEXT:
@@ -1550,6 +1552,8 @@ error_add_context:
 			}
 		}
 
+		//XXX:Start investigation here...
+		printf("This is a non-live session.\n");
 		ret = cmd_create_session_uri(cmd_ctx->lsm->session.name, uris, nb_uri,
 			&cmd_ctx->creds, 0);
 
@@ -1796,6 +1800,7 @@ error_add_context:
 		size_t nb_uri, len;
 		struct lttng_uri *uris = NULL;
 
+		//XXX:Continue investigation
 		nb_uri = cmd_ctx->lsm->u.uri.size;
 		len = nb_uri * sizeof(struct lttng_uri);
 
@@ -1835,6 +1840,7 @@ error_add_context:
 		size_t nb_uri, len;
 		struct lttng_uri *uris = NULL;
 
+		//XXX:There is trouble if we get here...
 		nb_uri = cmd_ctx->lsm->u.uri.size;
 		len = nb_uri * sizeof(struct lttng_uri);
 
@@ -2132,7 +2138,7 @@ static void *thread_manage_clients(void *data)
 	}
 
 	/* Set state as running. */
-        set_thread_status(true);
+	set_thread_status(true);
 	pthread_cleanup_pop(0);
 
 	/* This testpoint is after we signal readiness to the parent. */
