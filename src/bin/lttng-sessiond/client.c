@@ -2174,11 +2174,6 @@ static void *thread_manage_clients(void *data)
 
 			health_code_update();
 
-			if (!revents) {
-				/* No activity for this FD (poll implementation). */
-				continue;
-			}
-
 			if (pollfd == thread_quit_pipe_fd) {
 				err = 0;
 				goto exit;
