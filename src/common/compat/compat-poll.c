@@ -292,6 +292,7 @@ error:
 int compat_poll_wait(struct lttng_poll_event *events, int timeout)
 {
 	int ret;
+	int eidx = 0;
 
 	if (events == NULL || events->current.events == NULL) {
 		ERR("poll wait arguments error");
@@ -324,10 +325,36 @@ int compat_poll_wait(struct lttng_poll_event *events, int timeout)
 	}
 
 	/*
-	 * poll() should always iterate on all FDs since we handle the pollset in
-	 * user space and after poll returns, we have to try every fd for a match.
+	 * Swap all nonzero revents pollfd structs to the beginning of the array to
+	 * emulate compat-epoll behaviour. This algorithm takes advantage of poll's
+	 * returned value and the burst nature of waking events on the file
+	 * descriptors. The while loop garantees that idlepfd will always point to
+	 * a pollfd with revents == 0.
 	 */
-	return events->wait.nb_fd;
+	if (ret == events->wait.nb_fd) {
+		goto skip;
+	}
+	while (eidx < ret && events->wait.events[eidx].revents != 0) {
+		eidx += 1;
+	}
+
+	for (int idx = eidx + 1; eidx < ret; idx++) {
+		struct pollfd swapfd;
+		struct pollfd *idlepfd = &events->wait.events[eidx];
+		struct pollfd *ipfd = &events->wait.events[idx];
+
+		assert(idx < events->wait.nb_fd);
+
+		if (ipfd->revents != 0) {
+			swapfd = *ipfd;
+			*ipfd = *idlepfd;
+			*idlepfd = swapfd;
+			eidx += 1;
+		}
+	}
+
+skip:
+	return ret;
 
 error:
 	return -1;
