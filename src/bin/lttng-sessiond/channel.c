@@ -87,6 +87,7 @@ struct lttng_channel *channel_new_default_attr(int dom,
 		goto common_ust;
 	case LTTNG_DOMAIN_UST:
 common_ust:
+		printf("Hi, i'm drunk and forcing defaults when I shouldn't\n");
 		switch (type) {
 		case LTTNG_BUFFER_PER_UID:
 			chan->attr.subbuf_size = default_get_ust_uid_channel_subbuf_size();

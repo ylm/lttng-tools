@@ -179,6 +179,7 @@ static int ask_channel_creation(struct ust_app_session *ua_sess,
 		break;
 	}
 
+	printf("Sending st %i\n", ua_chan->attr.switch_timer_interval);
 	consumer_init_ask_channel_comm_msg(&msg,
 			ua_chan->attr.subbuf_size,
 			ua_chan->attr.num_subbuf,

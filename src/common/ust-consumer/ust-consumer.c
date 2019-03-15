@@ -456,6 +456,8 @@ static int create_ust_channel(struct lttng_consumer_channel *channel,
 			attr->num_subbuf, attr->switch_timer_interval,
 			attr->read_timer_interval, attr->output, attr->type);
 
+	printf("I might be drunk: %i\n", attr->switch_timer_interval);
+	printf("Channel type: %i\n", channel->type);
 	if (channel->type == CONSUMER_CHANNEL_TYPE_METADATA)
 		nr_stream_fds = 1;
 	else
@@ -1425,7 +1427,7 @@ int lttng_ustconsumer_recv_cmd(struct lttng_consumer_local_data *ctx,
 		struct ustctl_consumer_channel_attr attr;
 
 		/* Create a plain object and reserve a channel key. */
-		printf("");
+		printf("pre-allocate st = %i\n", msg.u.ask_channel.switch_timer_interval);
 		channel = allocate_channel(msg.u.ask_channel.session_id,
 				msg.u.ask_channel.pathname, msg.u.ask_channel.name,
 				msg.u.ask_channel.uid, msg.u.ask_channel.gid,
@@ -1453,6 +1455,7 @@ int lttng_ustconsumer_recv_cmd(struct lttng_consumer_local_data *ctx,
 		attr.subbuf_size = msg.u.ask_channel.subbuf_size;
 		attr.num_subbuf = msg.u.ask_channel.num_subbuf;
 		attr.overwrite = msg.u.ask_channel.overwrite;
+		printf("post-allocate st = %i\n", msg.u.ask_channel.switch_timer_interval);
 		attr.switch_timer_interval = msg.u.ask_channel.switch_timer_interval;
 		attr.read_timer_interval = msg.u.ask_channel.read_timer_interval;
 		attr.chan_id = msg.u.ask_channel.chan_id;
@@ -1502,8 +1505,9 @@ int lttng_ustconsumer_recv_cmd(struct lttng_consumer_local_data *ctx,
 				ERR("Allocating metadata cache");
 				goto end_channel_error;
 			}
+			printf("attr st = %i\n", attr.switch_timer_interval);
 			consumer_timer_switch_start(channel, attr.switch_timer_interval);
-			attr.switch_timer_interval = 0;
+			//attr.switch_timer_interval = 0;
 		} else {
 			int monitor_start_ret;
 

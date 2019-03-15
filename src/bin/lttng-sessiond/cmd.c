@@ -334,6 +334,7 @@ static ssize_t list_lttng_channels(enum lttng_domain_type domain,
 			channels[i].attr.num_subbuf = uchan->attr.num_subbuf;
 			channels[i].attr.switch_timer_interval =
 				uchan->attr.switch_timer_interval;
+			printf("Switch timer interval = %i\n",uchan->attr.switch_timer_interval);
 			channels[i].attr.read_timer_interval =
 				uchan->attr.read_timer_interval;
 			channels[i].enabled = uchan->enabled;
@@ -1480,6 +1481,8 @@ int cmd_enable_channel(struct ltt_session *session,
 	 * live timer does the same thing but sends also synchronisation
 	 * beacons for inactive streams.
 	 */
+	printf("live_timer = %i\n", session->live_timer);
+	printf("timer interval = %i\n", attr->attr.switch_timer_interval);
 	if (session->live_timer > 0) {
 		attr->attr.live_timer_interval = session->live_timer;
 		attr->attr.switch_timer_interval = 0;

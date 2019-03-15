@@ -100,6 +100,7 @@ static void metadata_switch_timer(struct lttng_consumer_local_data *ctx,
 		return;
 	}
 
+	printf("Say hello!\n");
 	DBG("Switch timer for channel %" PRIu64, channel->key);
 	switch (ctx->type) {
 	case LTTNG_CONSUMER32_UST:
@@ -456,6 +457,7 @@ int consumer_channel_timer_start(timer_t *timer_id,
 	sev.sigev_signo = signal;
 	sev.sigev_value.sival_ptr = channel;
 	ret = timer_create(CLOCKID, &sev, timer_id);
+	printf("create ret = %i\n",ret);
 	if (ret == -1) {
 		PERROR("timer_create");
 		goto end;
@@ -465,8 +467,11 @@ int consumer_channel_timer_start(timer_t *timer_id,
 	its.it_value.tv_nsec = (timer_interval_us % 1000000) * 1000;
 	its.it_interval.tv_sec = its.it_value.tv_sec;
 	its.it_interval.tv_nsec = its.it_value.tv_nsec;
+	printf("value %i sec, %i nsec\n",its.it_value.tv_sec,its.it_value.tv_nsec);
+	printf("interval %i sec, %i nsec\n",its.it_interval.tv_sec,its.it_interval.tv_nsec);
 
 	ret = timer_settime(*timer_id, 0, &its, NULL);
+	printf("set ret = %i\n",ret);
 	if (ret == -1) {
 		PERROR("timer_settime");
 		goto error_destroy_timer;
@@ -506,13 +511,16 @@ void consumer_timer_switch_start(struct lttng_consumer_channel *channel,
 {
 	int ret;
 
+	printf("We starting dah timer.\n");
 	assert(channel);
 	assert(channel->key);
+	printf("We really starting dah timer.\n");
 
 	ret = consumer_channel_timer_start(&channel->switch_timer, channel,
 			switch_timer_interval_us, LTTNG_CONSUMER_SIG_SWITCH);
 
 	channel->switch_timer_enabled = !!(ret == 0);
+	printf("ret is %i\n", ret);
 }
 
 /*
@@ -522,6 +530,7 @@ void consumer_timer_switch_stop(struct lttng_consumer_channel *channel)
 {
 	int ret;
 
+	printf("We stoppin' dah timer.\n");
 	assert(channel);
 
 	ret = consumer_channel_timer_stop(&channel->switch_timer,
@@ -813,6 +822,7 @@ void *consumer_timer_thread(void *data)
 		goto error_testpoint;
 	}
 
+	DBG("Timer thread is started");
 	health_code_update();
 
 	/* Only self thread will receive signal mask. */
@@ -825,6 +835,7 @@ void *consumer_timer_thread(void *data)
 		health_poll_entry();
 		signr = sigwaitinfo(&mask, &info);
 		health_poll_exit();
+		DBG("We got timer event");
 
 		/*
 		 * NOTE: cascading conditions are used instead of a switch case
@@ -838,10 +849,6 @@ void *consumer_timer_thread(void *data)
 			continue;
 		} else if (signr == LTTNG_CONSUMER_SIG_SWITCH) {
 			metadata_switch_timer(ctx, &info);
-			if (ctx->type == LTTNG_CONSUMER64_UST || ctx->type ==
-					LTTNG_CONSUMER32_UST) {
-				live_timer(ctx, &info);
-			}
 		} else if (signr == LTTNG_CONSUMER_SIG_TEARDOWN) {
 			cmm_smp_mb();
 			CMM_STORE_SHARED(timer_signal.qs_done, 1);

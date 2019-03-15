@@ -291,6 +291,7 @@ struct ltt_ust_session *trace_ust_create_session(uint64_t session_id)
 	lus->metadata_attr.overwrite = DEFAULT_CHANNEL_OVERWRITE;
 	lus->metadata_attr.subbuf_size = default_get_metadata_subbuf_size();
 	lus->metadata_attr.num_subbuf = DEFAULT_METADATA_SUBBUF_NUM;
+	printf("Yeah, I'm drunk!\n");
 	lus->metadata_attr.switch_timer_interval = DEFAULT_METADATA_SWITCH_TIMER;
 	lus->metadata_attr.read_timer_interval = DEFAULT_METADATA_READ_TIMER;
 	lus->metadata_attr.output = LTTNG_UST_MMAP;
@@ -353,6 +354,7 @@ struct ltt_ust_channel *trace_ust_create_channel(struct lttng_channel *chan,
 	luc->attr.overwrite = chan->attr.overwrite;
 	luc->attr.subbuf_size = chan->attr.subbuf_size;
 	luc->attr.num_subbuf = chan->attr.num_subbuf;
+	printf("switch timer inverval = %i\n", chan->attr.switch_timer_interval),
 	luc->attr.switch_timer_interval = chan->attr.switch_timer_interval;
 	luc->attr.read_timer_interval = chan->attr.read_timer_interval;
 	luc->attr.output = (enum lttng_ust_output) chan->attr.output;
