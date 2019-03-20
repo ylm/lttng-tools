@@ -1282,6 +1282,32 @@ function lttng_snapshot_del_output_fail ()
 	lttng_snapshot_del_output 1 "$@"
 }
 
+function lttng_snapshot_del_output_by_name ()
+{
+	local expected_to_fail=$1
+	local sess_name=$2
+	local name=$3
+
+	$TESTDIR/../src/bin/lttng/$LTTNG_BIN snapshot del-output -s $sess_name $name 1> $OUTPUT_DEST 2> $ERROR_OUTPUT_DEST
+	ret=$?
+	if [[ $expected_to_fail -eq "1" ]]; then
+		test "$ret" -ne "0"
+		ok $? "Deleted snapshot output name $name failed as expected"
+	else
+		ok $ret "Deleted snapshot output name $name"
+	fi
+}
+
+function lttng_snapshot_del_output_by_name_ok ()
+{
+	lttng_snapshot_del_output_by_name 0 "$@"
+}
+
+function lttng_snapshot_del_output_by_name_fail ()
+{
+	lttng_snapshot_del_output_by_name 1 "$@"
+}
+
 function lttng_snapshot_record ()
 {
 	local sess_name=$1

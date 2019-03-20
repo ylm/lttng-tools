@@ -31,7 +31,7 @@ APPS_PID=
 
 TRACE_PATH=$(mktemp -d)
 
-NUM_TESTS=75
+NUM_TESTS=91
 
 source $TESTDIR/utils/utils.sh
 
@@ -233,6 +233,49 @@ function test_ust_n_snapshot()
 	return 0
 }
 
+# Test commandline parsing of snapshot options
+function test_ust_cmd_opt()
+{
+	diag "Test commandline parsing of snapshot options"
+	create_lttng_session_no_output $SESSION_NAME
+	enable_lttng_mmap_overwrite_ust_channel $SESSION_NAME $CHANNEL_NAME
+	enable_ust_lttng_event_ok $SESSION_NAME $EVENT_NAME $CHANNEL_NAME
+	start_lttng_tracing_ok $SESSION_NAME
+
+	start_test_app
+
+	snapshot_add_output $SESSION_NAME "net://localhost"
+	lttng_snapshot_record $SESSION_NAME
+
+	# Validate test
+	echo $TRACE_PATH/$HOSTNAME/snapshot-1
+	validate_trace $EVENT_NAME $TRACE_PATH/$HOSTNAME/snapshot-1*
+	if [ $? -ne 0 ]; then
+		stop_test_apps
+		return $?
+	fi
+
+	lttng_snapshot_del_output_by_name_fail $SESSION_NAME "snap"
+	lttng_snapshot_del_output_by_name_fail $SESSION_NAME "snapshot-100"
+	lttng_snapshot_del_output_by_name_ok $SESSION_NAME "snapshot-1"
+	snapshot_add_output $SESSION_NAME "net://localhost"
+	lttng_snapshot_record $SESSION_NAME
+
+	# Validate test with the next ID since a del output was done prior.
+	validate_trace $EVENT_NAME $TRACE_PATH/$HOSTNAME/snapshot-2*
+	if [ $? -ne 0 ]; then
+		stop_test_apps
+		return $?
+	fi
+
+	stop_lttng_tracing_ok $SESSION_NAME
+	destroy_lttng_session_ok $SESSION_NAME
+
+	stop_test_apps
+
+	return 0
+}
+
 plan_tests $NUM_TESTS
 
 print_test_banner "$TEST_DESC"
@@ -251,6 +294,7 @@ tests=( test_ust_default_name_with_del
 	test_ust_custom_name
 	test_ust_default_name_custom_uri
 	test_ust_n_snapshot
+	test_ust_cmd_opt
 )
 
 for fct_test in ${tests[@]};
