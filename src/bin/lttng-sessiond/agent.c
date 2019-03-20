@@ -149,8 +149,7 @@ static int ht_match_event(struct cds_lfht_node *node,
 	}
 
 	if (event->filter_expression) {
-		if (strncmp(event->filter_expression, key->filter_expression,
-				strlen(event->filter_expression)) != 0) {
+		if (strcmp(event->filter_expression, key->filter_expression) != 0) {
 			goto no_match;
 		}
 	}

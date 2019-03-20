@@ -264,9 +264,7 @@ static int create_session(void)
 		 */
 		if ((strncmp(opt_session_name, DEFAULT_SESSION_NAME "-",
 					strlen(DEFAULT_SESSION_NAME) + 1) == 0) ||
-				(strncmp(opt_session_name, DEFAULT_SESSION_NAME,
-					strlen(DEFAULT_SESSION_NAME)) == 0 &&
-				strlen(opt_session_name) == strlen(DEFAULT_SESSION_NAME))) {
+				(strcmp(opt_session_name, DEFAULT_SESSION_NAME) == 0)) {
 			ERR("%s is a reserved keyword for default session(s)",
 					DEFAULT_SESSION_NAME);
 			ret = CMD_ERROR;

@@ -48,7 +48,7 @@ static int ht_match_event(struct cds_lfht_node *node, const void *_key)
 	key = _key;
 
 	/* It has to be a perfect match. First, compare the event names. */
-	if (strncmp(event->name, key->name, sizeof(event->name))) {
+	if (strcmp(event->name, key->name)) {
 		goto no_match;
 	}
 

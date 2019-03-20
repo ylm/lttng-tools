@@ -975,6 +975,7 @@ int lttng_elf_get_sdt_probe_offsets(int fd, const char *provider_name,
 		 * and go to the next 4 byte alignement.
 		 */
 		if (note_type != NOTE_STAPSDT_TYPE ||
+			name_size != strlen(NOTE_STAPSDT_NAME) ||
 			strncmp(curr_data_ptr, NOTE_STAPSDT_NAME, name_size) != 0) {
 			continue;
 		}
