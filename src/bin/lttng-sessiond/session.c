@@ -508,6 +508,7 @@ struct ltt_session *session_find_by_name(const char *name)
 	DBG2("Trying to find session by name %s", name);
 
 	cds_list_for_each_entry(iter, &ltt_session_list.head, list) {
+		//FIXME: ylamarre: name might also not be NULL terminated and less than NAME_MAX
 		if (!strncmp(iter->name, name, NAME_MAX) &&
 				!iter->destroyed) {
 			goto found;

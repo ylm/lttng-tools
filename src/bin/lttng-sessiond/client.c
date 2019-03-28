@@ -350,6 +350,7 @@ static int copy_session_consumer(int domain, struct ltt_session *session)
 	assert(session);
 	assert(session->consumer);
 
+	//FIXME: ylamarre, a revoir...
 	switch (domain) {
 	case LTTNG_DOMAIN_KERNEL:
 		DBG3("Copying tracing session consumer output in kernel session");
@@ -446,6 +447,8 @@ static int create_ust_session(struct ltt_session *session,
 		strncpy(lus->shm_path, session->shm_path,
 			sizeof(lus->shm_path));
 		lus->shm_path[sizeof(lus->shm_path) - 1] = '\0';
+		//FIXME: We have a define for this...
+		//FIXME: Shouldn't we error out if /ust can't be appended or make sure that the strncpy leaves room for it...
 		strncat(lus->shm_path, "/ust",
 			sizeof(lus->shm_path) - strlen(lus->shm_path) - 1);
 	}
@@ -945,6 +948,7 @@ static int process_client_msg(struct command_ctx *cmd_ctx, int sock,
 
 			/* Start the UST consumer daemons */
 			/* 64-bit */
+			//TODO: ylamarre, Re-audit this part...
 			pthread_mutex_lock(&ustconsumer64_data.pid_mutex);
 			if (config.consumerd64_bin_path.value &&
 					ustconsumer64_data.pid == 0 &&
@@ -1050,6 +1054,7 @@ skip_domain:
 		}
 	}
 
+	//FIXME: copypasta :-)
 	/*
 	 * Send relayd information to consumer as soon as we have a domain and a
 	 * session defined.
@@ -1680,6 +1685,7 @@ error_add_context:
 	{
 		struct consumer_data *cdata;
 
+		//XXX: We have not verified the creds yet...
 		switch (cmd_ctx->lsm->domain.type) {
 		case LTTNG_DOMAIN_KERNEL:
 			cdata = &kconsumer_data;
