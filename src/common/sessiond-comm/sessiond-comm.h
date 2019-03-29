@@ -662,21 +662,6 @@ struct lttcomm_consumer_status_channel {
 #include <lttng/ust-abi.h>
 
 /*
- * Data structure for the commands sent from sessiond to UST.
- */
-struct lttcomm_ust_msg {
-	uint32_t handle;
-	uint32_t cmd;
-	union {
-		struct lttng_ust_channel channel;
-		struct lttng_ust_stream stream;
-		struct lttng_ust_event event;
-		struct lttng_ust_context context;
-		struct lttng_ust_tracer_version version;
-	} u;
-} LTTNG_PACKED;
-
-/*
  * Data structure for the response from UST to the session daemon.
  * cmd_type is sent back in the reply for validation.
  */
