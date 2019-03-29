@@ -189,6 +189,7 @@ struct lttng_event_context {
 	union {
 		struct lttng_event_perf_counter_ctx perf_counter;
 		struct {
+			//FIXME: ylamarre potential size mismatch because of pointers
 			char *provider_name;
 			char *ctx_name;
 		} app_ctx;

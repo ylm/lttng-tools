@@ -37,6 +37,7 @@ struct lttng_snapshot_output {
 	 * stream combined. A value of 0 is unlimited.
 	 */
 	uint64_t max_size;
+	//FIXME:ylamarre: Didn't we care about word alignment?
 	/* Name of the output so it can be recognized easily when listing them. */
 	char name[LTTNG_NAME_MAX];
 	/* Destination of the output. See lttng(1) for URL format. */

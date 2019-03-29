@@ -88,6 +88,7 @@ struct lttng_ust_channel {
 	uint64_t len;
 	enum lttng_ust_chan_type type;
 	char padding[LTTNG_UST_CHANNEL_PADDING];
+	//FIXME: ylamarre: Is that a pointer or an empty array?
 	char data[];	/* variable sized data */
 } LTTNG_PACKED;
 
@@ -214,6 +215,7 @@ struct lttng_ust_object_data {
 	char padding1[LTTNG_UST_OBJECT_DATA_PADDING1];
 	union {
 		struct {
+			//FIXME: ylamarre: another pointer without union
 			void *data;
 			enum lttng_ust_chan_type type;
 			int wakeup_fd;
@@ -297,6 +299,7 @@ struct lttng_ust_obj;
 
 union ust_args {
 	struct {
+		//FIXME: ylamarre: another pointer without union
 		void *chan_data;
 		int wakeup_fd;
 	} channel;
