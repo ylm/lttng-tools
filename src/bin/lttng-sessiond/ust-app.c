@@ -1045,7 +1045,7 @@ struct ust_app_channel *alloc_ust_app_channel(char *name,
 
 	/* Copy attributes */
 	if (attr) {
-		/* Translate from lttng_ust_channel to ustctl_consumer_channel_attr. */
+		/* Translate from lttng_ust_channel_attr to ustctl_consumer_channel_attr. */
 		ua_chan->attr.subbuf_size = attr->subbuf_size;
 		ua_chan->attr.num_subbuf = attr->num_subbuf;
 		ua_chan->attr.overwrite = attr->overwrite;
