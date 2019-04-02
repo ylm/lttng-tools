@@ -773,7 +773,7 @@ struct lttcomm_consumer_status_msg {
 } LTTNG_PACKED;
 
 struct lttcomm_consumer_status_channel {
-	enum lttcomm_return_code ret_code;
+	uint32_t ret_code; /* enum lttcomm_return_code */
 	uint64_t key;
 	unsigned int stream_count;
 } LTTNG_PACKED;
