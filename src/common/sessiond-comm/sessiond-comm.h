@@ -577,7 +577,7 @@ struct lttcomm_consumer_msg {
 			uint32_t nb_init_streams;
 			char name[LTTNG_SYMBOL_NAME_LEN];
 			/* Use splice or mmap to consume this fd */
-			enum lttng_event_output output;
+			uint32_t output; /* enum lttng_event_output */
 			int type; /* Per cpu or metadata. */
 			uint64_t tracefile_size; /* bytes */
 			uint32_t tracefile_count; /* number of tracefiles */
@@ -604,7 +604,7 @@ struct lttcomm_consumer_msg {
 		} LTTNG_PACKED stream;	/* Only used by Kernel. */
 		struct {
 			uint64_t net_index;
-			enum lttng_stream_type type;
+			uint32_t type; /* enum lttng_stream_type */
 			/* Open socket to the relayd */
 			struct lttcomm_relayd_sock_serialized sock;
 			/* Tracing session id associated to the relayd. */
