@@ -769,7 +769,7 @@ struct lttcomm_consumer_channel_monitor_msg {
  * Status message returned to the sessiond after a received command.
  */
 struct lttcomm_consumer_status_msg {
-	enum lttcomm_return_code ret_code;
+	uint32_t ret_code; /* enum lttcomm_return_code */
 } LTTNG_PACKED;
 
 struct lttcomm_consumer_status_channel {
