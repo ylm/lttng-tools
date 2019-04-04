@@ -27,6 +27,17 @@
 
 struct lttng_userspace_probe_location;
 
+struct lttng_event_perf_counter_ctx_serialized {
+	uint32_t type;
+	uint64_t config;
+	char name[LTTNG_SYMBOL_NAME_LEN];
+} LTTNG_PACKED;
+
+struct lttng_event_context_serialized {
+	uint32_t ctx; /* enum lttng_event_context_type */
+	struct lttng_event_perf_counter_ctx_serialized perf_counter;
+} LTTNG_PACKED;
+
 struct lttng_event_extended {
 	/*
 	 * exclusions and filter_expression are only set when the lttng_event
