@@ -403,9 +403,9 @@ struct lttcomm_session_msg {
 		} LTTNG_PACKED disable;
 		/* Create channel */
 		struct {
-			struct lttng_channel chan LTTNG_PACKED;
+			struct lttng_channel_serialized chan;
 			/* struct lttng_channel_extended is already packed. */
-			struct lttng_channel_extended extended;
+			struct lttng_channel_extended_serialized extended;
 		} LTTNG_PACKED channel;
 		/* Context */
 		struct {

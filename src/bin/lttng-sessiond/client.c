@@ -1184,10 +1184,13 @@ error_add_context:
 	}
 	case LTTNG_ENABLE_CHANNEL:
 	{
-		cmd_ctx->lsm->u.channel.chan.attr.extended.ptr =
-				(struct lttng_channel_extended *) &cmd_ctx->lsm->u.channel.extended;
+		struct lttng_channel channel;
+		struct lttng_channel_extended extended;
+		lttng_channel_extended_deserialize(&extended, &cmd_ctx->lsm->u.channel.extended);
+		lttng_channel_deserialize(&channel, &cmd_ctx->lsm->u.channel.chan);
+		channel.attr.extended.ptr = &extended;
 		ret = cmd_enable_channel(cmd_ctx->session, &cmd_ctx->lsm->domain,
-				&cmd_ctx->lsm->u.channel.chan,
+				&channel,
 				kernel_poll_pipe[1]);
 		break;
 	}

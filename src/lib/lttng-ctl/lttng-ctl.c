@@ -1529,33 +1529,17 @@ int lttng_enable_channel(struct lttng_handle *handle,
 	}
 
 	memset(&lsm, 0, sizeof(lsm));
-	memcpy(&lsm.u.channel.chan, in_chan, sizeof(lsm.u.channel.chan));
-	lsm.u.channel.chan.attr.extended.ptr = NULL;
-
 	if (!in_chan->attr.extended.ptr) {
-		struct lttng_channel *channel;
-		struct lttng_channel_extended *extended;
-
-		channel = lttng_channel_create(&handle->domain);
-		if (!channel) {
-			return -LTTNG_ERR_NOMEM;
-		}
-
-		/*
-		 * Create a new channel in order to use default extended
-		 * attribute values.
-		 */
-		extended = (struct lttng_channel_extended *)
-				channel->attr.extended.ptr;
-		memcpy(&lsm.u.channel.extended, extended, sizeof(*extended));
-		lttng_channel_destroy(channel);
+		init_serialized_extended_channel(&handle->domain, &lsm.u.channel.extended);
 	} else {
 		struct lttng_channel_extended *extended;
 
 		extended = (struct lttng_channel_extended *)
 				in_chan->attr.extended.ptr;
-		memcpy(&lsm.u.channel.extended, extended, sizeof(*extended));
+		lttng_channel_extended_serialize(&lsm.u.channel.extended, extended);
 	}
+
+	lttng_channel_serialize(&lsm.u.channel.chan, in_chan);
 
 	/*
 	 * Verify that the amount of memory required to create the requested
