@@ -20,7 +20,37 @@
 
 #include <common/macros.h>
 
+struct lttng_channel_attr_serialized {
+	int overwrite;                      /* -1: session default, 1: overwrite, 0: discard */
+	uint64_t subbuf_size;               /* bytes, power of 2 */
+	uint64_t num_subbuf;                /* power of 2 */
+	unsigned int switch_timer_interval; /* usec */
+	unsigned int read_timer_interval;   /* usec */
+	uint32_t output; /* enum lttng_event_output */
+	/* LTTng 2.1 padding limit */
+	uint64_t tracefile_size;            /* bytes */
+	uint64_t tracefile_count;           /* number of tracefiles */
+	/* LTTng 2.3 padding limit */
+	unsigned int live_timer_interval;   /* usec */
+	/* LTTng 2.7 padding limit */
+
+} LTTNG_PACKED;
+
+struct lttng_channel_serialized {
+	char name[LTTNG_SYMBOL_NAME_LEN];
+	uint32_t enabled;
+	struct lttng_channel_attr_serialized attr;
+
+} LTTNG_PACKED;
+
 struct lttng_channel_extended {
+	uint64_t discarded_events;
+	uint64_t lost_packets;
+	uint64_t monitor_timer_interval;
+	int64_t blocking_timeout;
+};
+
+struct lttng_channel_extended_serialized {
 	uint64_t discarded_events;
 	uint64_t lost_packets;
 	uint64_t monitor_timer_interval;
