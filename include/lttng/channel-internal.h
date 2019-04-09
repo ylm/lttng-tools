@@ -57,4 +57,9 @@ struct lttng_channel_extended_serialized {
 	int64_t blocking_timeout;
 } LTTNG_PACKED;
 
+int lttng_channel_serialize(struct lttng_channel_serialized *dst, const struct lttng_channel *src);
+int lttng_channel_deserialize(struct lttng_channel *dst, const struct lttng_channel_serialized *src);
+int lttng_channel_extended_deserialize(struct lttng_channel_extended *dst, const struct lttng_channel_extended_serialized *src);
+int lttng_channel_extended_serialize(struct lttng_channel_extended_serialized *dst, const struct lttng_channel_extended *src);
+int init_serialized_extended_channel(struct lttng_domain *domain, struct lttng_channel_extended_serialized *extended);
 #endif /* LTTNG_CHANNEL_INTERNAL_H */

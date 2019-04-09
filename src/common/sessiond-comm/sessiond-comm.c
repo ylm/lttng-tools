@@ -76,6 +76,111 @@ static const char *lttcomm_readable_code[] = {
 
 static unsigned long network_timeout;
 
+int init_serialized_extended_channel(struct lttng_domain *domain, struct
+		lttng_channel_extended_serialized *extended)
+{
+	assert(domain && extended);
+	switch (domain->type) {
+	case LTTNG_DOMAIN_KERNEL:
+		extended->monitor_timer_interval =
+			DEFAULT_KERNEL_CHANNEL_MONITOR_TIMER;
+		extended->blocking_timeout =
+			DEFAULT_KERNEL_CHANNEL_BLOCKING_TIMEOUT;
+		break;
+	case LTTNG_DOMAIN_UST:
+		switch (domain->buf_type) {
+		case LTTNG_BUFFER_PER_UID:
+			extended->monitor_timer_interval =
+				DEFAULT_UST_UID_CHANNEL_MONITOR_TIMER;
+			extended->blocking_timeout =
+				DEFAULT_UST_UID_CHANNEL_BLOCKING_TIMEOUT;
+			break;
+		case LTTNG_BUFFER_PER_PID:
+		default:
+			extended->monitor_timer_interval =
+				DEFAULT_UST_PID_CHANNEL_MONITOR_TIMER;
+			extended->blocking_timeout =
+				DEFAULT_UST_PID_CHANNEL_BLOCKING_TIMEOUT;
+			break;
+		}
+	default:
+		/* Default behavior: leave set to 0. */
+		break;
+	}
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_channel_extended_serialize(struct lttng_channel_extended_serialized *dst,
+		const struct lttng_channel_extended *src)
+{
+	assert(src && dst);
+	dst->discarded_events = src->discarded_events;
+	dst->lost_packets = src->lost_packets;
+	dst->monitor_timer_interval = src->monitor_timer_interval;
+	dst->blocking_timeout = src->blocking_timeout;
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_channel_extended_deserialize(struct lttng_channel_extended *dst,
+		const struct lttng_channel_extended_serialized *src)
+{
+	assert(src && dst);
+	dst->discarded_events = src->discarded_events;
+	dst->lost_packets = src->lost_packets;
+	dst->monitor_timer_interval = src->monitor_timer_interval;
+	dst->blocking_timeout = src->blocking_timeout;
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_channel_serialize(struct lttng_channel_serialized *dst,
+		const struct lttng_channel *src)
+{
+	assert(src && dst);
+	struct lttng_channel_attr_serialized *dst_attr = &dst->attr;
+	const struct lttng_channel_attr *src_attr = &src->attr;
+
+	dst_attr->overwrite = src_attr->overwrite;
+	dst_attr->subbuf_size = src_attr->subbuf_size;
+	dst_attr->num_subbuf = src_attr->num_subbuf;
+	dst_attr->switch_timer_interval = src_attr->switch_timer_interval;
+	dst_attr->read_timer_interval = src_attr->read_timer_interval;
+	dst_attr->output = (uint32_t) src_attr->output;
+	dst_attr->tracefile_size = src_attr->tracefile_size;
+	dst_attr->tracefile_count = src_attr->tracefile_count;
+	dst_attr->live_timer_interval = src_attr->live_timer_interval;
+
+	dst->enabled = src->enabled;
+	memcpy(dst->name, src->name, sizeof(dst->name));
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_channel_deserialize(struct lttng_channel *dst,
+		const struct lttng_channel_serialized *src)
+{
+	assert(src && dst);
+	struct lttng_channel_attr *dst_attr = &dst->attr;
+	const struct lttng_channel_attr_serialized *src_attr = &src->attr;
+
+	dst_attr->overwrite = src_attr->overwrite;
+	dst_attr->subbuf_size = src_attr->subbuf_size;
+	dst_attr->num_subbuf = src_attr->num_subbuf;
+	dst_attr->switch_timer_interval = src_attr->switch_timer_interval;
+	dst_attr->read_timer_interval = src_attr->read_timer_interval;
+	dst_attr->output = (enum lttng_event_output) src_attr->output;
+	dst_attr->tracefile_size = src_attr->tracefile_size;
+	dst_attr->tracefile_count = src_attr->tracefile_count;
+	dst_attr->live_timer_interval = src_attr->live_timer_interval;
+
+	dst->enabled = src->enabled;
+	memcpy(dst->name, src->name, sizeof(dst->name));
+	return 0;
+}
+
 LTTNG_HIDDEN
 int sockaddr_in_serialize(struct sockaddr_in_serialized *dst,
 		const struct sockaddr_in *src)
