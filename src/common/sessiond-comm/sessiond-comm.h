@@ -31,6 +31,7 @@
 #include <lttng/snapshot-internal.h>
 #include <lttng/save-internal.h>
 #include <lttng/channel-internal.h>
+#include <lttng/event-internal.h>
 #include <lttng/trigger/trigger-internal.h>
 #include <lttng/rotate-internal.h>
 #include <common/compat/socket.h>

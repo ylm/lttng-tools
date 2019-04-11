@@ -76,6 +76,48 @@ static const char *lttcomm_readable_code[] = {
 
 static unsigned long network_timeout;
 
+LTTNG_HIDDEN
+int lttng_event_perf_counter_ctx_serialize(struct lttng_event_perf_counter_ctx_serialized *dst,
+		const struct lttng_event_perf_counter_ctx *src)
+{
+	assert(src && dst);
+	dst->type = src->type;
+	dst->config = src->config;
+	memcpy(&dst->name, &src->name, LTTNG_SYMBOL_NAME_LEN);
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_perf_counter_ctx_deserialize(struct lttng_event_perf_counter_ctx *dst,
+		const struct lttng_event_perf_counter_ctx_serialized *src)
+{
+	assert(src && dst);
+	dst->type = src->type;
+	dst->config = src->config;
+	memcpy(&dst->name, &src->name, LTTNG_SYMBOL_NAME_LEN);
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_context_serialize(struct lttng_event_context_serialized *dst,
+		const struct lttng_event_context *src)
+{
+	assert(src && dst);
+	dst->ctx = (uint32_t) src->ctx;
+	lttng_event_perf_counter_ctx_serialize(&dst->perf_counter, &src->u.perf_counter);
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_context_deserialize(struct lttng_event_context *dst,
+		const struct lttng_event_context_serialized *src)
+{
+	assert(src && dst);
+	dst->ctx = (enum lttng_event_context_type) src->ctx;
+	lttng_event_perf_counter_ctx_deserialize(&dst->u.perf_counter, &src->perf_counter);
+	return 0;
+}
+
 int init_serialized_extended_channel(struct lttng_domain *domain, struct
 		lttng_channel_extended_serialized *extended)
 {
