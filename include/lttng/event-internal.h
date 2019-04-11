@@ -57,4 +57,8 @@ struct lttng_event_extended {
 LTTNG_HIDDEN
 struct lttng_event *lttng_event_copy(const struct lttng_event *event);
 
+int lttng_event_context_serialize(struct lttng_event_context_serialized *dst, const struct lttng_event_context *src);
+int lttng_event_context_deserialize(struct lttng_event_context *dst, const struct lttng_event_context_serialized *src);
+int lttng_event_perf_counter_ctx_serialize(struct lttng_event_perf_counter_ctx_serialized *dst, const struct lttng_event_perf_counter_ctx *src);
+int lttng_event_perf_counter_ctx_deserialize(struct lttng_event_perf_counter_ctx *dst, const struct lttng_event_perf_counter_ctx_serialized *src);
 #endif /* LTTNG_EVENT_INTERNAL_H */

@@ -1071,6 +1071,8 @@ skip_domain:
 	switch (cmd_ctx->lsm->cmd_type) {
 	case LTTNG_ADD_CONTEXT:
 	{
+		struct lttng_event_context evt_ctx;
+		lttng_event_context_deserialize(&evt_ctx, &cmd_ctx->lsm->u.context.ctx);
 		/*
 		 * An LTTNG_ADD_CONTEXT command might have a supplementary
 		 * payload if the context being added is an application context.
@@ -1097,7 +1099,7 @@ skip_domain:
 				ret = -LTTNG_ERR_NOMEM;
 				goto error;
 			}
-			cmd_ctx->lsm->u.context.ctx.u.app_ctx.provider_name =
+			evt_ctx.u.app_ctx.provider_name =
 					provider_name;
 
 			context_name = zmalloc(context_name_len + 1);
@@ -1105,7 +1107,7 @@ skip_domain:
 				ret = -LTTNG_ERR_NOMEM;
 				goto error_add_context;
 			}
-			cmd_ctx->lsm->u.context.ctx.u.app_ctx.ctx_name =
+			evt_ctx.u.app_ctx.ctx_name =
 					context_name;
 
 			ret = lttcomm_recv_unix_sock(sock, provider_name,
@@ -1128,14 +1130,14 @@ skip_domain:
 		ret = cmd_add_context(cmd_ctx->session,
 				cmd_ctx->lsm->domain.type,
 				cmd_ctx->lsm->u.context.channel_name,
-				&cmd_ctx->lsm->u.context.ctx,
+				&evt_ctx,
 				kernel_poll_pipe[1]);
 
-		cmd_ctx->lsm->u.context.ctx.u.app_ctx.provider_name = NULL;
-		cmd_ctx->lsm->u.context.ctx.u.app_ctx.ctx_name = NULL;
+		evt_ctx.u.app_ctx.provider_name = NULL;
+		evt_ctx.u.app_ctx.ctx_name = NULL;
 error_add_context:
-		free(cmd_ctx->lsm->u.context.ctx.u.app_ctx.provider_name);
-		free(cmd_ctx->lsm->u.context.ctx.u.app_ctx.ctx_name);
+		free(evt_ctx.u.app_ctx.provider_name);
+		free(evt_ctx.u.app_ctx.ctx_name);
 		if (ret < 0) {
 			goto error;
 		}
