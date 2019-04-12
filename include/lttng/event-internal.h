@@ -27,6 +27,44 @@
 
 struct lttng_userspace_probe_location;
 
+struct lttng_event_probe_attr_serialized {
+	uint64_t addr;
+
+	uint64_t offset;
+	char symbol_name[LTTNG_SYMBOL_NAME_LEN];
+} LTTNG_PACKED;
+
+struct lttng_event_function_attr_serialized {
+	char symbol_name[LTTNG_SYMBOL_NAME_LEN];
+} LTTNG_PACKED;
+
+struct lttng_event_serialized {
+	uint32_t type; /* enum lttng_event_type */
+
+	char name[LTTNG_SYMBOL_NAME_LEN];
+
+	uint32_t loglevel_type; /* enum lttng_loglevel_type */
+
+	int loglevel;
+
+	int32_t enabled;	/* Does not apply: -1 */
+
+	pid_t pid;
+
+	unsigned char filter;	/* filter enabled ? */
+
+	unsigned char exclusion; /* exclusions added ? */
+
+	/* Event flag, from 2.6 and above. */
+	uint32_t flags; /* enum lttng_event_flag */
+
+	/* Per event type configuration */
+	union {
+		struct lttng_event_probe_attr_serialized probe;
+		struct lttng_event_function_attr_serialized ftrace;
+	} attr;
+} LTTNG_PACKED;
+
 struct lttng_event_perf_counter_ctx_serialized {
 	uint32_t type;
 	uint64_t config;
