@@ -422,7 +422,6 @@ struct lttcomm_session_msg {
 		struct {
 			char channel_name[LTTNG_SYMBOL_NAME_LEN];
 		} LTTNG_PACKED list;
-		struct lttng_calibrate calibrate;
 		/* Used by the set_consumer_url and used by create_session also call */
 		struct {
 			/* Number of lttng_uri following */
