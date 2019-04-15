@@ -77,6 +77,122 @@ static const char *lttcomm_readable_code[] = {
 static unsigned long network_timeout;
 
 LTTNG_HIDDEN
+int lttng_event_common_serialize(struct lttng_event_serialized *dst,
+		const struct lttng_event *src)
+{
+	dst->type = (uint32_t) src->type;
+
+	memcpy(dst->name, src->name, LTTNG_SYMBOL_NAME_LEN);
+
+	dst->loglevel_type = (uint32_t) src->loglevel_type;
+	dst->loglevel = src->loglevel;
+	dst->enabled = src->enabled;
+	dst->pid = src->pid;
+	dst->filter = src->filter;
+	dst->exclusion = src->exclusion;
+	dst->flags = (uint32_t) src->flags;
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_common_deserialize(struct lttng_event *dst,
+		const struct lttng_event_serialized *src)
+{
+	dst->type = (enum lttng_event_type) src->type;
+
+	memcpy(dst->name, src->name, LTTNG_SYMBOL_NAME_LEN);
+
+	dst->loglevel_type = (enum lttng_loglevel_type) src->loglevel_type;
+	dst->loglevel = src->loglevel;
+	dst->enabled = src->enabled;
+	dst->pid = src->pid;
+	dst->filter = src->filter;
+	dst->exclusion = src->exclusion;
+	dst->flags = (enum lttng_event_flag) src->flags;
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_probe_attr_serialize(struct lttng_event_serialized *dst,
+		const struct lttng_event *src)
+{
+	assert(src && dst);
+	lttng_event_common_serialize(dst, src);
+
+	dst->attr.probe.addr = src->attr.probe.addr;
+	dst->attr.probe.offset = src->attr.probe.offset;
+
+	memcpy(dst->attr.probe.symbol_name, src->attr.probe.symbol_name, LTTNG_SYMBOL_NAME_LEN);
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_probe_attr_deserialize(struct lttng_event *dst,
+		const struct lttng_event_serialized *src)
+{
+	assert(src && dst);
+	lttng_event_common_deserialize(dst, src);
+
+	dst->attr.probe.addr = src->attr.probe.addr;
+	dst->attr.probe.offset = src->attr.probe.offset;
+
+	memcpy(dst->attr.probe.symbol_name, src->attr.probe.symbol_name, LTTNG_SYMBOL_NAME_LEN);
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_function_attr_serialize(struct lttng_event_serialized *dst,
+		const struct lttng_event *src)
+{
+	assert(src && dst);
+	lttng_event_common_serialize(dst, src);
+
+	memcpy(dst->attr.ftrace.symbol_name, src->attr.ftrace.symbol_name, LTTNG_SYMBOL_NAME_LEN);
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_function_attr_deserialize(struct lttng_event *dst,
+		const struct lttng_event_serialized *src)
+{
+	assert(src && dst);
+	lttng_event_common_deserialize(dst, src);
+
+	memcpy(dst->attr.ftrace.symbol_name, src->attr.ftrace.symbol_name, LTTNG_SYMBOL_NAME_LEN);
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_no_attr_serialize(struct lttng_event_serialized *dst,
+		const struct lttng_event *src)
+{
+	assert(src && dst);
+	lttng_event_common_serialize(dst, src);
+
+	memset(&dst->attr, 0, sizeof(dst->attr));
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_event_no_attr_deserialize(struct lttng_event *dst,
+		const struct lttng_event_serialized *src)
+{
+	assert(src && dst);
+	lttng_event_common_deserialize(dst, src);
+
+	memset(&dst->attr, 0, sizeof(dst->attr));
+
+	return 0;
+}
+
+LTTNG_HIDDEN
 int lttng_event_perf_counter_ctx_serialize(struct lttng_event_perf_counter_ctx_serialized *dst,
 		const struct lttng_event_perf_counter_ctx *src)
 {

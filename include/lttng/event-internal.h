@@ -95,6 +95,12 @@ struct lttng_event_extended {
 LTTNG_HIDDEN
 struct lttng_event *lttng_event_copy(const struct lttng_event *event);
 
+int lttng_event_probe_attr_serialize(struct lttng_event_serialized *dst, const struct lttng_event *src);
+int lttng_event_function_attr_serialize(struct lttng_event_serialized *dst, const struct lttng_event *src);
+int lttng_event_no_attr_serialize(struct lttng_event_serialized *dst, const struct lttng_event *src);
+int lttng_event_probe_attr_deserialize(struct lttng_event *dst, const struct lttng_event_serialized *src);
+int lttng_event_function_attr_deserialize(struct lttng_event *dst, const struct lttng_event_serialized *src);
+int lttng_event_no_attr_deserialize(struct lttng_event *dst, const struct lttng_event_serialized *src);
 int lttng_event_context_serialize(struct lttng_event_context_serialized *dst, const struct lttng_event_context *src);
 int lttng_event_context_deserialize(struct lttng_event_context *dst, const struct lttng_event_context_serialized *src);
 int lttng_event_perf_counter_ctx_serialize(struct lttng_event_perf_counter_ctx_serialized *dst, const struct lttng_event_perf_counter_ctx *src);
