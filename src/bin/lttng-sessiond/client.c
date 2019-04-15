@@ -1152,6 +1152,7 @@ error_add_context:
 	case LTTNG_DISABLE_EVENT:
 	{
 
+		struct lttng_event event;
 		/*
 		 * FIXME: handle filter; for now we just receive the filter's
 		 * bytecode along with the filter expression which are sent by
@@ -1178,10 +1179,17 @@ error_add_context:
 				count -= (size_t) ret;
 			}
 		}
-		/* FIXME: passing packed structure to non-packed pointer */
+		lttng_event_no_attr_deserialize(&event, &cmd_ctx->lsm->u.disable.event);
+		if (cmd_ctx->lsm->domain.type == LTTNG_DOMAIN_KERNEL) {
+			if (event.type == LTTNG_EVENT_PROBE || event.type == LTTNG_EVENT_FUNCTION || event.type == LTTNG_EVENT_USERSPACE_PROBE) {
+				lttng_event_probe_attr_deserialize(&event, &cmd_ctx->lsm->u.disable.event);
+			} else if (event.type == LTTNG_EVENT_FUNCTION_ENTRY) {
+				lttng_event_function_attr_deserialize(&event, &cmd_ctx->lsm->u.disable.event);
+			}
+		}
 		ret = cmd_disable_event(cmd_ctx->session, cmd_ctx->lsm->domain.type,
 				cmd_ctx->lsm->u.disable.channel_name,
-				&cmd_ctx->lsm->u.disable.event);
+				&event);
 		break;
 	}
 	case LTTNG_ENABLE_CHANNEL:
@@ -1212,6 +1220,7 @@ error_add_context:
 	}
 	case LTTNG_ENABLE_EVENT:
 	{
+		struct lttng_event event;
 		struct lttng_event *ev = NULL;
 		struct lttng_event_exclusion *exclusion = NULL;
 		struct lttng_filter_bytecode *bytecode = NULL;
@@ -1314,7 +1323,15 @@ error_add_context:
 			}
 		}
 
-		ev = lttng_event_copy(&cmd_ctx->lsm->u.enable.event);
+		lttng_event_no_attr_deserialize(&event, &cmd_ctx->lsm->u.disable.event);
+		if (cmd_ctx->lsm->domain.type == LTTNG_DOMAIN_KERNEL) {
+			if (event.type == LTTNG_EVENT_PROBE || event.type == LTTNG_EVENT_FUNCTION || event.type == LTTNG_EVENT_USERSPACE_PROBE) {
+				lttng_event_probe_attr_deserialize(&event, &cmd_ctx->lsm->u.disable.event);
+			} else if (event.type == LTTNG_EVENT_FUNCTION_ENTRY) {
+				lttng_event_function_attr_deserialize(&event, &cmd_ctx->lsm->u.disable.event);
+			}
+		}
+		ev = lttng_event_copy(&event);
 		if (!ev) {
 			DBG("Failed to copy event: %s",
 					cmd_ctx->lsm->u.enable.event.name);

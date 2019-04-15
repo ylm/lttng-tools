@@ -1112,8 +1112,15 @@ int lttng_enable_event_with_exclusions(struct lttng_handle *handle,
 	}
 
 	lttng_ctl_copy_lttng_domain(&lsm.domain, &handle->domain);
-	/* FIXME: copying non-packed struct to packed struct. */
-	memcpy(&lsm.u.enable.event, ev, sizeof(lsm.u.enable.event));
+
+	lttng_event_no_attr_serialize(&lsm.u.enable.event, ev);
+	if (handle->domain.type == LTTNG_DOMAIN_KERNEL) {
+		if (ev->type == LTTNG_EVENT_PROBE || ev->type == LTTNG_EVENT_FUNCTION || ev->type == LTTNG_EVENT_USERSPACE_PROBE) {
+			lttng_event_probe_attr_serialize(&lsm.u.enable.event, ev);
+		} else if (ev->type == LTTNG_EVENT_FUNCTION_ENTRY) {
+			lttng_event_function_attr_serialize(&lsm.u.enable.event, ev);
+		}
+	}
 
 	lttng_ctl_copy_string(lsm.session.name, handle->session_name,
 			sizeof(lsm.session.name));
@@ -1312,8 +1319,7 @@ int lttng_disable_event_ext(struct lttng_handle *handle,
 	lsm.cmd_type = LTTNG_DISABLE_EVENT;
 
 	lttng_ctl_copy_lttng_domain(&lsm.domain, &handle->domain);
-	/* FIXME: copying non-packed struct to packed struct. */
-	memcpy(&lsm.u.disable.event, ev, sizeof(lsm.u.disable.event));
+	lttng_event_no_attr_serialize(&lsm.u.disable.event, ev);
 
 	lttng_ctl_copy_string(lsm.session.name, handle->session_name,
 			sizeof(lsm.session.name));
