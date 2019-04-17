@@ -45,6 +45,14 @@ struct lttng_snapshot_output {
 	char data_url[PATH_MAX];
 };
 
+struct lttng_snapshot_output_serialized {
+	uint32_t id;
+	uint64_t max_size;
+	char name[LTTNG_NAME_MAX];
+	char ctrl_url[PATH_MAX];
+	char data_url[PATH_MAX];
+} LTTNG_PACKED;
+
 /*
  * Snapshot output list object opaque to the user.
  */
