@@ -77,6 +77,34 @@ static const char *lttcomm_readable_code[] = {
 static unsigned long network_timeout;
 
 LTTNG_HIDDEN
+int lttng_snapshot_output_serialize(struct lttng_snapshot_output_serialized *dst,
+		const struct lttng_snapshot_output *src)
+{
+	dst->id = src->id;
+	dst->max_size = src->max_size;
+
+	memcpy(dst->name, src->name, LTTNG_NAME_MAX);
+	memcpy(dst->ctrl_url, src->ctrl_url, PATH_MAX);
+	memcpy(dst->data_url, src->data_url, PATH_MAX);
+
+	return 0;
+}
+
+LTTNG_HIDDEN
+int lttng_snapshot_output_deserialize(struct lttng_snapshot_output *dst,
+		const struct lttng_snapshot_output_serialized *src)
+{
+	dst->id = src->id;
+	dst->max_size = src->max_size;
+
+	memcpy(dst->name, src->name, LTTNG_NAME_MAX);
+	memcpy(dst->ctrl_url, src->ctrl_url, PATH_MAX);
+	memcpy(dst->data_url, src->data_url, PATH_MAX);
+
+	return 0;
+}
+
+LTTNG_HIDDEN
 int lttng_event_common_serialize(struct lttng_event_serialized *dst,
 		const struct lttng_event *src)
 {

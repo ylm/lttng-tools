@@ -73,4 +73,7 @@ struct lttng_snapshot_output_list {
 	struct lttng_snapshot_output *array;
 };
 
+int lttng_snapshot_output_serialize(struct lttng_snapshot_output_serialized *dst, const struct lttng_snapshot_output *src);
+int lttng_snapshot_output_deserialize(struct lttng_snapshot_output *dst, const struct lttng_snapshot_output_serialized *src);
+
 #endif /* LTTNG_SNAPSHOT_INTERNAL_ABI_H */
