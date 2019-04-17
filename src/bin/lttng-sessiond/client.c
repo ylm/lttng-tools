@@ -1723,9 +1723,12 @@ error_add_context:
 	case LTTNG_SNAPSHOT_ADD_OUTPUT:
 	{
 		struct lttcomm_lttng_output_id reply;
+		struct lttng_snapshot_output snapshot_output;
+
+		lttng_snapshot_output_deserialize(&snapshot_output, &cmd_ctx->lsm->u.snapshot_output.output);
 
 		ret = cmd_snapshot_add_output(cmd_ctx->session,
-				&cmd_ctx->lsm->u.snapshot_output.output, &reply.id);
+				&snapshot_output, &reply.id);
 		if (ret != LTTNG_OK) {
 			goto error;
 		}
@@ -1742,14 +1745,19 @@ error_add_context:
 	}
 	case LTTNG_SNAPSHOT_DEL_OUTPUT:
 	{
+		struct lttng_snapshot_output snapshot_output;
+
+		lttng_snapshot_output_deserialize(&snapshot_output, &cmd_ctx->lsm->u.snapshot_output.output);
+
 		ret = cmd_snapshot_del_output(cmd_ctx->session,
-				&cmd_ctx->lsm->u.snapshot_output.output);
+				&snapshot_output);
 		break;
 	}
 	case LTTNG_SNAPSHOT_LIST_OUTPUT:
 	{
 		ssize_t nb_output;
 		struct lttng_snapshot_output *outputs = NULL;
+		struct lttng_snapshot_output_serialized *serialized_outputs;
 
 		nb_output = cmd_snapshot_list_outputs(cmd_ctx->session, &outputs);
 		if (nb_output < 0) {
@@ -1758,9 +1766,14 @@ error_add_context:
 		}
 
 		assert((nb_output > 0 && outputs) || nb_output == 0);
-		ret = setup_lttng_msg_no_cmd_header(cmd_ctx, outputs,
-				nb_output * sizeof(struct lttng_snapshot_output));
+		serialized_outputs = malloc(sizeof(struct lttng_snapshot_output_serialized) * nb_output);
+		for (int i = 0; i < nb_output; i++) {
+			lttng_snapshot_output_serialize(&serialized_outputs[i], &outputs[i]);
+		}
 		free(outputs);
+		ret = setup_lttng_msg_no_cmd_header(cmd_ctx, serialized_outputs,
+				nb_output * sizeof(struct lttng_snapshot_output_serialized));
+		free(serialized_outputs);
 
 		if (ret < 0) {
 			goto setup_error;
@@ -1771,8 +1784,12 @@ error_add_context:
 	}
 	case LTTNG_SNAPSHOT_RECORD:
 	{
+		struct lttng_snapshot_output snapshot_output;
+
+		lttng_snapshot_output_deserialize(&snapshot_output, &cmd_ctx->lsm->u.snapshot_output.output);
+
 		ret = cmd_snapshot_record(cmd_ctx->session,
-				&cmd_ctx->lsm->u.snapshot_record.output,
+				&snapshot_output,
 				cmd_ctx->lsm->u.snapshot_record.wait);
 		break;
 	}

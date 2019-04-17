@@ -47,8 +47,7 @@ int lttng_snapshot_add_output(const char *session_name,
 
 	lttng_ctl_copy_string(lsm.session.name, session_name,
 			sizeof(lsm.session.name));
-	memcpy(&lsm.u.snapshot_output.output, output,
-			sizeof(lsm.u.snapshot_output.output));
+	lttng_snapshot_output_serialize(&lsm.u.snapshot_output.output, output);
 
 	ret = lttng_ctl_ask_sessiond(&lsm, (void **) &reply);
 	if (ret < 0) {
@@ -80,8 +79,7 @@ int lttng_snapshot_del_output(const char *session_name,
 
 	lttng_ctl_copy_string(lsm.session.name, session_name,
 			sizeof(lsm.session.name));
-	memcpy(&lsm.u.snapshot_output.output, output,
-			sizeof(lsm.u.snapshot_output.output));
+	lttng_snapshot_output_serialize(&lsm.u.snapshot_output.output, output);
 
 	return lttng_ctl_ask_sessiond(&lsm, NULL);
 }
@@ -99,6 +97,7 @@ int lttng_snapshot_list_output(const char *session_name,
 	int ret;
 	struct lttcomm_session_msg lsm;
 	struct lttng_snapshot_output_list *new_list = NULL;
+	struct lttng_snapshot_output_serialized *serialized_array;
 
 	if (!session_name || !list) {
 		ret = -LTTNG_ERR_INVALID;
@@ -117,12 +116,22 @@ int lttng_snapshot_list_output(const char *session_name,
 		goto error;
 	}
 
-	ret = lttng_ctl_ask_sessiond(&lsm, (void **) &new_list->array);
+	ret = lttng_ctl_ask_sessiond(&lsm, (void **) &serialized_array);
 	if (ret < 0) {
 		goto free_error;
 	}
 
-	new_list->count = ret / sizeof(struct lttng_snapshot_output);
+	new_list->count = ret / sizeof(struct lttng_snapshot_output_serialized);
+	new_list->array = zmalloc(sizeof(struct lttng_snapshot_output) * new_list->count);
+	if (!new_list) {
+		ret = -LTTNG_ERR_NOMEM;
+		goto free_error;
+	}
+	for (int i = 0; i < new_list->count; i++) {
+		lttng_snapshot_output_deserialize(&new_list->array[i], &serialized_array[i]);
+	}
+	free(serialized_array);
+
 	*list = new_list;
 	return 0;
 
@@ -207,8 +216,7 @@ int lttng_snapshot_record(const char *session_name,
 	 * record.
 	 */
 	if (output) {
-		memcpy(&lsm.u.snapshot_record.output, output,
-				sizeof(lsm.u.snapshot_record.output));
+		lttng_snapshot_output_serialize(&lsm.u.snapshot_record.output, output);
 	}
 
 	/* The wait param is ignored. */

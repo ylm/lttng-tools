@@ -429,11 +429,11 @@ struct lttcomm_session_msg {
 			uint32_t size;
 		} LTTNG_PACKED uri;
 		struct {
-			struct lttng_snapshot_output output LTTNG_PACKED;
+			struct lttng_snapshot_output_serialized output;
 		} LTTNG_PACKED snapshot_output;
 		struct {
 			uint32_t wait;
-			struct lttng_snapshot_output output LTTNG_PACKED;
+			struct lttng_snapshot_output_serialized output;
 		} LTTNG_PACKED snapshot_record;
 		struct {
 			uint32_t nb_uri;
